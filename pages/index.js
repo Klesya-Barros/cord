@@ -44,7 +44,7 @@ export default function PaginaInicial() {
                 styleSheet={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     backgroundColor: appConfig.theme.colors.primary[100],
-                    backgroundImage: 'url(https://as2.ftcdn.net/v2/jpg/03/72/66/55/1000_F_372665540_0Bv6ql47R2dsyHfnr8qfgnzF8B2jSiJI.jpg)',
+                    backgroundImage: 'url(https://cdn.pixabay.com/photo/2020/12/25/04/51/polar-lights-5858656_960_720.jpg)',
                     backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 }}
             >
