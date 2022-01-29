@@ -1,25 +1,55 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import react from 'react';
-import React from 'react';
 import appConfig from '../config.json';
+import { useRouter } from 'next/router';
+import { createClient } from '@supabase/supabase-js'
+import { ButtonSendSticker } from '../src/Components/ButtonSendSticker';
+
+// Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMzMzkxMiwiZXhwIjoxOTU4OTA5OTEyfQ.y75DjVnPglsP6HtVsZGzj-cRBb4qGA-GcK49bn5pfMw';
+const SUPABASE_URL = 'https://pjwhmagtvhxfnovwzyrn.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
     const [mensagem, setMensagem] = react.useState('');
     const [listaDeMensagens, setListaDeMensagens] = react.useState([]);
-    // Sua lógica vai aqui
+    
+    react.useEffect(() => {
 
-    // ./Sua lógica vai aqui
+        const dadosDoSupabase = supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+                console.log('Dados da consulta:', data);
+                setListaDeMensagens(data);           
+            });
+    }, []);
+
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaDeMensagens.length + 1,
-            de: '',
+            //id: listaDeMensagens.length + 1,
+            de: usuarioLogado,
             texto: novaMensagem,
         };
-        setListaDeMensagens([
-            mensagem,
-            ...listaDeMensagens,
-            
-        ]);
+
+        supabaseClient
+            .from ('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then(({ data }) => {
+                console.log('Criando mensagem: ', data);
+                setListaDeMensagens([
+                    data[0],
+                    ...listaDeMensagens,
+                    
+                ]);
+            })
+            ;
         setMensagem('');
     }
 
@@ -102,6 +132,7 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker />
                     </Box>
                 </Box>
             </Box>
@@ -168,7 +199,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}

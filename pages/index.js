@@ -69,7 +69,7 @@ export default function PaginaInicial() {
                         onSubmit={function (infosDoEvento) {
                             infosDoEvento.preventDefault();
                             //window.location.href = '/chat';  o jeito normal com reload da pag.
-                            roteamento.push('/chat');
+                            roteamento.push(`/chat?username=${username}`);
                         }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
