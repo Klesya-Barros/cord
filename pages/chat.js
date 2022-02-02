@@ -10,6 +10,14 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5v
 const SUPABASE_URL = 'https://pjwhmagtvhxfnovwzyrn.supabase.co';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function escutaMensagensEmTempoReal(adicionaMensagem) {
+    return supabaseClient
+    .from('mensagem')
+    .on('INSERT', ({ respostaLive }) => {
+        adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
 
 export default function ChatPage() {
     const roteamento = useRouter();
@@ -27,6 +35,16 @@ export default function ChatPage() {
                 console.log('Dados da consulta:', data);
                 setListaDeMensagens(data);           
             });
+
+            escutaMensagensEmTempoReal((novaMensagem) => {
+                setListaDeMensagens((valorAtualDaLista) => {
+                    return [
+                    novaMensagem,
+                    ...valorAtualDaLista,    
+                ]
+            });
+                
+            });
     }, []);
 
     function handleNovaMensagem(novaMensagem) {
@@ -43,13 +61,7 @@ export default function ChatPage() {
             ])
             .then(({ data }) => {
                 console.log('Criando mensagem: ', data);
-                setListaDeMensagens([
-                    data[0],
-                    ...listaDeMensagens,
-                    
-                ]);
-            })
-            ;
+            });
         setMensagem('');
     }
 
@@ -132,7 +144,11 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
-                        <ButtonSendSticker />
+                        <ButtonSendSticker
+                            onStickerClick={(sticker) => {
+                                handleNovaMensagem(':sticker: ' + sticker);
+                            }}                        
+                        />
                     </Box>
                 </Box>
             </Box>
@@ -215,7 +231,13 @@ function MessageList(props) {
                                 {(new Date().toLocaleDateString())}
                             </Text>
                         </Box>
-                        {mensagem.texto}
+                        {mensagem.texto.startsWith(':sticker:')
+                            ? (
+                                <Image src={mensagem.texto.replace(':sticker:', '')} />
+                            )
+                            : (
+                                mensagem.texto
+                            )}
                     </Text>
 
                 );
