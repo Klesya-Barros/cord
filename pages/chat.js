@@ -13,7 +13,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function escutaMensagensEmTempoReal(adicionaMensagem) {
     return supabaseClient
     .from('mensagem')
-    .on('INSERT', ({ respostaLive }) => {
+    .on('INSERT', (respostaLive) => {
         adicionaMensagem(respostaLive.new);
     })
     .subscribe();
@@ -26,8 +26,7 @@ export default function ChatPage() {
     const [listaDeMensagens, setListaDeMensagens] = react.useState([]);
     
     react.useEffect(() => {
-
-        const dadosDoSupabase = supabaseClient
+     supabaseClient
             .from('mensagens')
             .select('*')
             .order('id', { ascending: false })
@@ -36,7 +35,7 @@ export default function ChatPage() {
                 setListaDeMensagens(data);           
             });
 
-            escutaMensagensEmTempoReal((novaMensagem) => {
+            const subscription = escutaMensagensEmTempoReal((novaMensagem) => {
                 setListaDeMensagens((valorAtualDaLista) => {
                     return [
                     novaMensagem,
@@ -44,8 +43,12 @@ export default function ChatPage() {
                 ]
             });
                 
-            });
-    }, []);
+         });
+
+         return () => {
+             subscription.unsubscribe();
+         }
+        }, []);
 
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
