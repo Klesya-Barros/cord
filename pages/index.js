@@ -1,5 +1,5 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
-import react from 'react';
+import React from 'react';
 import {useRouter} from 'next/router';
 import appConfig from '../config.json';
 
@@ -35,7 +35,7 @@ function Titulo(props) {
 
 export default function PaginaInicial() {
    // const username = 'Klesya-Barros';
-   const [username, setUsername] = react.useState('');
+   const [username, setUsername] = React.useState('');
    const roteamento = useRouter();
 
     return (

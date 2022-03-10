@@ -1,5 +1,5 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import react from 'react';
+import React from 'react';
 import appConfig from '../config.json';
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js'
@@ -12,7 +12,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function escutaMensagensEmTempoReal(adicionaMensagem) {
     return supabaseClient
-    .from('mensagem')
+    .from('mensagens')
     .on('INSERT', (respostaLive) => {
         adicionaMensagem(respostaLive.new);
     })
@@ -22,27 +22,29 @@ function escutaMensagensEmTempoReal(adicionaMensagem) {
 export default function ChatPage() {
     const roteamento = useRouter();
     const usuarioLogado = roteamento.query.username;
-    const [mensagem, setMensagem] = react.useState('');
-    const [listaDeMensagens, setListaDeMensagens] = react.useState([]);
+    const [mensagem, setMensagem] = React.useState('');
+    const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
     
-    react.useEffect(() => {
+    React.useEffect(() => {
      supabaseClient
             .from('mensagens')
             .select('*')
             .order('id', { ascending: false })
             .then(({ data }) => {
-                console.log('Dados da consulta:', data);
+                //console.log('Dados da consulta:', data);
                 setListaDeMensagens(data);           
             });
 
             const subscription = escutaMensagensEmTempoReal((novaMensagem) => {
+                console.log('Nova Mensagem:', novaMensagem);
+                console.log('listaDeMensagens:', listaDeMensagens);
                 setListaDeMensagens((valorAtualDaLista) => {
-                    return [
-                    novaMensagem,
-                    ...valorAtualDaLista,    
+                 console.log('valorAtualDaLista:', valorAtualDaLista);
+                return [
+                 novaMensagem,
+                 ...valorAtualDaLista,    
                 ]
-            });
-                
+            });      
          });
 
          return () => {
@@ -65,6 +67,7 @@ export default function ChatPage() {
             .then(({ data }) => {
                 console.log('Criando mensagem: ', data);
             });
+            
         setMensagem('');
     }
 
@@ -178,7 +181,7 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log('MessageList', props);
+    //console.log('MessageList', props);
     return (
         <Box
             tag="ul"
